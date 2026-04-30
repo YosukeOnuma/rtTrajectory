@@ -1,0 +1,9 @@
+# ビルド生成物を除外
+build/
+bin/
+
+# OSが作るゴミファイル
+.DS_Store
+
+# IDEの設定
+.vscode/
