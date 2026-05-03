@@ -15,7 +15,7 @@ find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 # 4. 実行ファイルを作る
-add_executable(ball_sim main.cpp)
+add_executable(ball_sim main.cpp src/ekf.cpp)
 
 # 5. ライブラリとパスを紐付ける（変数形式に変更）
 target_link_libraries(ball_sim 
@@ -29,4 +29,5 @@ target_include_directories(ball_sim PRIVATE
     ${Pangolin_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
     ${OpenCV_INCLUDE_DIRS}
+    include
 )
