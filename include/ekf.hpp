@@ -2,6 +2,14 @@
 #include <Eigen/Dense>
 #include <vector>
 
+
+// 着弾予想の中心と分散をまとめた構造体
+struct ImpactPrediction {
+    Eigen::Vector2d pos;     // 予測位置
+    Eigen::Matrix2d cov;     // 予測の不確かさ（共分散行列）
+    bool reachable;
+};
+
 class BallEKF {
 public:
     /**
@@ -21,7 +29,7 @@ public:
     Eigen::VectorXd state() const { return x_; }
     
     // スクリーン(z=5.0)への到達予測地点を計算
-    Eigen::Vector2d predictScreenImpact(double screen_z = 5.0) const;
+    ImpactPrediction predictScreenImpact(double screen_z = 5.0) const;
 
 private:
     // 状態ベクトル x = [x, y, z, vx, vy, vz]^T

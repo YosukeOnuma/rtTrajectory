@@ -89,19 +89,39 @@ void BallEKF::update(const Eigen::Vector2d& z) {
     P_ = (Eigen::MatrixXd::Identity(6, 6) - K * H) * P_;
 }
 
-Eigen::Vector2d BallEKF::predictScreenImpact(double screen_z) const {
+ImpactPrediction BallEKF::predictScreenImpact(double screen_z) const {
+    ImpactPrediction res;
     double x = x_(0), y = x_(1), z = x_(2);
     double vx = x_(3), vy = x_(4), vz = x_(5);
     double g = -9.81;
 
-    if (vz <= 0.1) return Eigen::Vector2d(999, 999); // スクリーンに向かっていない
+    if (vz <= 0.1 || z >= screen_z) {
+        res.reachable = false;
+        return res;
+    }
 
-    // z = screen_z に到達する時間を計算: z + vz*dt = screen_z
-    double dt_impact = (screen_z - z) / vz;
-    if (dt_impact < 0) return Eigen::Vector2d(999, 999);
+    double dt = (screen_z - z) / vz;
+    res.pos << x + vx * dt, y + vy * dt + 0.5 * g * dt * dt;
+    res.reachable = true;
 
-    double x_impact = x + vx * dt_impact;
-    double y_impact = y + vy * dt_impact + 0.5 * g * dt_impact * dt_impact;
+    // --- ヤコビアン Jg の計算 ---
+    Eigen::MatrixXd Jg = Eigen::MatrixXd::Zero(2, 6);
+    double vy_final = vy + g * dt; // 着弾時のy方向速度
 
-    return Eigen::Vector2d(x_impact, y_impact);
+    // dx_s / dx...
+    Jg(0, 0) = 1.0;                  // dx_s / dx
+    Jg(0, 2) = -vx / vz;            // dx_s / dz
+    Jg(0, 3) = dt;                   // dx_s / dvx
+    Jg(0, 5) = -vx * dt / vz;        // dx_s / dvz
+
+    // dy_s / dy...
+    Jg(1, 1) = 1.0;                  // dy_s / dy
+    Jg(1, 2) = -vy_final / vz;       // dy_s / dz
+    Jg(1, 4) = dt;                   // dy_s / dvy
+    Jg(1, 5) = -vy_final * dt / vz;  // dy_s / dvz
+
+    // 不確かさの伝搬 P_impact = Jg * P * Jg^T
+    res.cov = Jg * P_ * Jg.transpose();
+
+    return res;
 }
