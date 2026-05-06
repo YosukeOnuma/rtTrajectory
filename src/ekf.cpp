@@ -5,14 +5,14 @@ BallEKF::BallEKF(const Eigen::Vector3d& initial_pos, const Eigen::Vector3d& init
     x_ = Eigen::VectorXd(6);
     x_ << initial_pos, initial_vel;
 
-    // 初期自信（P）: 最初は少しあやふや
-    P_ = Eigen::MatrixXd::Identity(6, 6) * 1.0;
+    // 初期分散（P）: 大きめにすると早く最初はノイズに敏感だが，初期値の誤差を素早く修正できる
+    P_ = Eigen::MatrixXd::Identity(6, 6) * 3.0;
 
-    // プロセスノイズ（Q）: 物理モデルの不確かさ（空気抵抗の変動など）
-    Q_ = Eigen::MatrixXd::Identity(6, 6) * 0.01;
+    // プロセスノイズ（Q）: 物理モデルの不確かさ（空気抵抗の変動など），今回は小さくて良い
+    Q_ = Eigen::MatrixXd::Identity(6, 6) * 1e-4;
 
     // 観測ノイズ（R）: カメラの測定誤差（ピクセル単位）
-    R_noise_ = Eigen::MatrixXd::Identity(2, 2) * 2.0; 
+    R_noise_ = Eigen::MatrixXd::Identity(2, 2) * 5.0; 
 }
 
 void BallEKF::setCameraParams(double fx, double fy, double cx, double cy, 
