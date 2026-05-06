@@ -146,8 +146,8 @@ int main() {
                         FY * (p_c.y() / p_c.z()) + CY;
                 
                 // 観測ノイズを付与 (標準偏差 2.0ピクセル程度)
-                z_uv.x() += ((double)rand()/RAND_MAX - 0.5) * 2.0;
-                z_uv.y() += ((double)rand()/RAND_MAX - 0.5) * 2.0;
+                z_uv.x() += ((double)rand()/RAND_MAX - 0.5) * 5.0;
+                z_uv.y() += ((double)rand()/RAND_MAX - 0.5) * 5.0;
 
                 trajectory_image_observed.push_back(z_uv);
                 
@@ -211,13 +211,13 @@ int main() {
             }
             glEnd();
 
-            // // EKF推定位置の表示 (緑色の小さな点)
-            // Eigen::VectorXd x_est = ekf.state();
-            // glColor3f(0.0f, 1.0f, 0.0f);
-            // glPointSize(6.0f);
-            // glBegin(GL_POINTS);
-            // glVertex3d(x_est(0), x_est(1), x_est(2));
-            // glEnd();
+            // スクリーン上の真の着弾点
+            Eigen::Vector3d impact_true = p0 + v0 * ((SCREEN_Z - p0.z()) / v0.z()) + 0.5 * g_vec * std::pow((SCREEN_Z - p0.z()) / v0.z(), 2);
+            glColor3f(1.0f, 1.0f, 0.0f); // 黄色で描画
+            glBegin(GL_LINES);
+            glVertex3f(impact_true.x()-0.1, impact_true.y(), SCREEN_Z); glVertex3f(impact_true.x()+0.1, impact_true.y(), SCREEN_Z);
+            glVertex3f(impact_true.x(), impact_true.y()-0.1, SCREEN_Z); glVertex3f(impact_true.x(), impact_true.y()+0.1, SCREEN_Z);
+            glEnd();
 
             // スクリーン上の着弾予測
             if (pred.reachable) {
