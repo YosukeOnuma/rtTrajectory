@@ -61,7 +61,6 @@ void BallEKF::update(const Eigen::Vector2d& z) {
     double Yc = p_cam.y();
     double Zc = p_cam.z();
 
-    if (Zc <= 0.1) return; // カメラの真横や後ろにある時は無視
 
     Eigen::Vector2d z_pred;
     z_pred << fx_ * (Xc / Zc) + cx_, fy_ * (Yc / Zc) + cy_;     // これが観測モデル h(x) の出力

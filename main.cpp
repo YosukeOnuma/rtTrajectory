@@ -150,7 +150,6 @@ int main() {
                 z_uv.y() += ((double)rand()/RAND_MAX - 0.5) * 2.0;
 
                 trajectory_image_observed.push_back(z_uv);
-                // std::cout << "Time: " << t_sim << "s, Observed UV: " << z_uv.transpose() << std::endl;
                 
                 observed = true;
                 last_obs_t = t_sim;
